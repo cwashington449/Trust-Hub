@@ -1,2 +1,2 @@
 # Trust-Hub
-Repository created by Bolt to GitHub extension
+My reimagining of Trust Hub
