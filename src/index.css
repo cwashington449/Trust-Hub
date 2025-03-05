@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.osano-cm-widget{display: none;} 
+.osano-cm-dialog{display: none;}
