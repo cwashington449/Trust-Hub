@@ -22,6 +22,7 @@ import {
   Server,
   Mail,
   Phone,
+  Link,
 } from 'lucide-react';
 
 interface ModalProps {
@@ -92,50 +93,7 @@ const DocumentTile = ({ title, description, url, icon: Icon }: DocumentTileProps
   );
 };
 
-const stats = [
-  { 
-    id: 1, 
-    name: 'Global Privacy Control Enabled',
-    value: null,
-    render: () => {
-      const isEnabled = navigator.globalPrivacyControl === true;
-      return (
-        <div className={`text-4xl font-bold ${isEnabled ? 'text-green-600' : 'text-red-600'} mb-2`}>
-          {isEnabled ? 'YES' : 'NO'}
-        </div>
-      );
-    }
-  },
-  { 
-    id: 2, 
-    name: 'Osano Version',
-    value: null,
-    render: () => {
-      const version = window.Osano?.cm?.cmpVersion || 'N/A';
-      return (
-        <>
-          <div className="text-4xl font-bold text-indigo-600 mb-2">{version}</div>
-          <a 
-            href="https://docs.osano.com/hc/en-us/categories/21084645441300-Release-Notes"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-indigo-600 hover:text-indigo-800 underline"
-          >
-            View Release Notes
-          </a>
-        </>
-      );
-    }
-  }
-];
-
 const sections = [
-  {
-    id: 'privacy',
-    title: 'Our Statement on Privacy',
-    icon: Shield,
-    description: 'Learn about our dedication to protecting your data and privacy rights.',
-  },
   {
     id: 'cookies',
     title: 'Cookie Management',
@@ -279,7 +237,7 @@ const securityCertifications = [
 const privacyOfficerInfo = {
   name: "Dr. Sarah Johnson",
   title: "Chief Privacy Officer",
-  email: "privacy@osano.com",
+  email: "privacy@trusthub.com",
   phone: "+1 (555) 123-4567",
 };
 
@@ -289,6 +247,10 @@ const PrivacyOfficerContact = () => {
     <div className="bg-white rounded-lg p-4 shadow mt-4">
       <h3 className="text-lg font-medium text-gray-900 mb-3">Data Privacy Officer</h3>
       <div className="space-y-3">
+        <div className="bg-indigo-50 p-3 rounded-lg inline-flex items-center justify-center">
+          <UserCircle className="h-6 w-6 text-indigo-600" />
+        </div>
+        <div className="space-y-2">
           <p className="font-medium text-gray-900">{privacyOfficerInfo.name}</p>
           <p className="text-sm text-gray-500">{privacyOfficerInfo.title}</p>
           
@@ -311,7 +273,55 @@ const PrivacyOfficerContact = () => {
           </p>
         </div>
       </div>
-   
+    </div>
+  );
+};
+
+// Privacy Statement Card component
+const PrivacyStatementCard = () => {
+  return (
+    <div className="bg-white rounded-lg shadow p-6 mb-8">
+      <div className="flex items-start gap-4 mb-4">
+        <div className="flex-shrink-0">
+          <div className="bg-indigo-50 p-3 rounded-lg">
+            <Shield className="h-6 w-6 text-indigo-600" />
+          </div>
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Osano</h2>
+          <p className="text-gray-600">
+            Osano is a leading privacy platform that helps organizations manage consent, data rights, and privacy compliance.
+            Our comprehensive solution enables businesses to build trust with their users through transparent privacy practices.
+          </p>
+          
+          <div className="flex items-center gap-4 mt-4">
+            <a href="mailto:privacy@osano.com" className="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+              <Mail className="h-4 w-4 mr-1" />
+              privacy@osano.com
+            </a>
+            <a href="https://www.osano.com/privacy" target="_blank" rel="noopener noreferrer" className="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+              <Link className="h-4 w-4 mr-1" />
+              Privacy Policy
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mt-4 pt-4 border-t border-gray-100">
+        <h3 className="text-xl font-semibold text-gray-900 mb-3">Privacy Statement</h3>
+        <p className="text-gray-600 mb-4">
+          At Osano, your privacy is paramount. We're committed to "Visible Privacy" - being transparent about how we collect, use, and protect your personal information.
+        </p>
+        
+        <p className="text-gray-600 mb-4">
+          We build trust through transparency and accountability, ensuring you feel confident when using our services. Our approach exceeds regulatory compliance by providing clear information about your privacy rights and meaningful control over your data.
+        </p>
+        
+        <p className="text-gray-600 mb-4">
+          We believe strong privacy practices create a secure online environment, fostering relationships built on trust and respect where you feel safe and valued.
+        </p>
+      </div>
+    </div>
   );
 };
 
@@ -344,21 +354,13 @@ const QuickActions = ({ handleViewUUID, handleManagePreferences }: {
 };
 
 function App() {
-  const [activeSection, setActiveSection] = useState('privacy');
+  const [activeSection, setActiveSection] = useState('cookies');
   const [isUUIDModalOpen, setIsUUIDModalOpen] = useState(false);
   const [isDisclosureModalOpen, setIsDisclosureModalOpen] = useState(false);
   const [uuid, setUUID] = useState('');
   const [disclosures, setDisclosures] = useState<CookieDisclosure[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (navigator.globalPrivacyControl === true) {
-      console.log("Global Privacy Control is enabled.");
-    } else {
-      console.log("Global Privacy Control is not enabled or not supported.");
-    }
-  }, []);
 
   useEffect(() => {
     window.showUUIDModal = (uuid: string) => {
@@ -410,25 +412,6 @@ function App() {
   };
   
   const sectionContent = {
-    privacy: {
-      title: 'Our Privacy Statement',
-      content: (
-        <>
-          <p className="text-gray-600 mb-4">
-            At Osano, we understand that your privacy is paramount. We are deeply committed to upholding the highest standards of data protection and transparency. Our approach to privacy is centered around the concept of "Visible Privacy," which means we are dedicated to being open and honest about how we collect, use, and protect your personal information.
-            <br /><br />
-            We believe that by fostering a culture of transparency and accountability, we can build a stronger foundation of trust with our users. We want you to feel confident and empowered when interacting with our services, knowing that your data is handled with the utmost care and respect.
-            <br /><br />
-            Our commitment to Visible Privacy extends beyond mere compliance with regulations. We strive to go above and beyond legal requirements by providing you with clear and accessible information about your privacy rights and how to exercise them. We also aim to give you meaningful control over your data, allowing you to make informed decisions about how your information is used.
-            <br /><br />
-            Ultimately, we believe that robust privacy practices are essential for creating a secure and positive online environment. By prioritizing your privacy, we aim to cultivate a relationship built on trust and mutual respect, fostering a community where you can feel safe and valued.
-        </p>
-          
-
-
-        </>
-      ),
-    },
     cookies: {
       title: 'Cookie Management',
       content: (
@@ -608,27 +591,11 @@ function App() {
         </div>
       </header>
 
-      {/* Stats */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {stats.map((stat) => (
-            <div key={stat.id} className="bg-white overflow-hidden shadow rounded-lg p-6 hover:shadow-md transition text-gray-900">
-              {stat.render ? (
-                stat.render()
-              ) : (
-                <div className="text-4xl font-bold text-indigo-600 mb-2">{stat.value}</div>
-              )}
-              <div className="text-sm text-gray-500">
-                {stat.name}
-                {stat.subtext && <span className="block">{stat.subtext}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Privacy Statement Card - Horizontally spans the document */}
+        <PrivacyStatementCard />
+        
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Navigation */}
           <div className="space-y-4">
