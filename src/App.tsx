@@ -20,6 +20,8 @@ import {
   ShieldCheck,
   AlertTriangle,
   Server,
+  Mail,
+  Phone,
 } from 'lucide-react';
 
 interface ModalProps {
@@ -130,7 +132,7 @@ const stats = [
 const sections = [
   {
     id: 'privacy',
-    title: 'Our Commitment to Privacy',
+    title: 'Our Statement on Privacy',
     icon: Shield,
     description: 'Learn about our dedication to protecting your data and privacy rights.',
   },
@@ -273,6 +275,46 @@ const securityCertifications = [
   },
 ];
 
+// Data Privacy Officer contact information
+const privacyOfficerInfo = {
+  name: "Dr. Sarah Johnson",
+  title: "Chief Privacy Officer",
+  email: "privacy@osano.com",
+  phone: "+1 (555) 123-4567",
+};
+
+// Contact card component for the Data Privacy Officer
+const PrivacyOfficerContact = () => {
+  return (
+    <div className="bg-white rounded-lg p-4 shadow mt-4">
+      <h3 className="text-lg font-medium text-gray-900 mb-3">Data Privacy Officer</h3>
+      <div className="space-y-3">
+          <p className="font-medium text-gray-900">{privacyOfficerInfo.name}</p>
+          <p className="text-sm text-gray-500">{privacyOfficerInfo.title}</p>
+          
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <Mail className="h-4 w-4 text-indigo-600" />
+            <a href={`mailto:${privacyOfficerInfo.email}`} className="hover:text-indigo-600">
+              {privacyOfficerInfo.email}
+            </a>
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <Phone className="h-4 w-4 text-indigo-600" />
+            <a href={`tel:${privacyOfficerInfo.phone}`} className="hover:text-indigo-600">
+              {privacyOfficerInfo.phone}
+            </a>
+          </div>
+          
+          <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-100">
+            Contact our Data Privacy Officer with any concerns about your personal data or our privacy practices.
+          </p>
+        </div>
+      </div>
+   
+  );
+};
+
 // Quick Actions component that will be persistent across all tabs
 const QuickActions = ({ handleViewUUID, handleManagePreferences }: { 
   handleViewUUID: () => void, 
@@ -369,21 +411,21 @@ function App() {
   
   const sectionContent = {
     privacy: {
-      title: 'Our Commitment to Privacy',
+      title: 'Our Privacy Statement',
       content: (
         <>
           <p className="text-gray-600 mb-4">
-            We believe in complete transparency when it comes to your data. Our visible privacy approach
-            means you always know what data we collect, how we use it, and why it matters.
-          </p>
+            At Osano, we understand that your privacy is paramount. We are deeply committed to upholding the highest standards of data protection and transparency. Our approach to privacy is centered around the concept of "Visible Privacy," which means we are dedicated to being open and honest about how we collect, use, and protect your personal information.
+            <br /><br />
+            We believe that by fostering a culture of transparency and accountability, we can build a stronger foundation of trust with our users. We want you to feel confident and empowered when interacting with our services, knowing that your data is handled with the utmost care and respect.
+            <br /><br />
+            Our commitment to Visible Privacy extends beyond mere compliance with regulations. We strive to go above and beyond legal requirements by providing you with clear and accessible information about your privacy rights and how to exercise them. We also aim to give you meaningful control over your data, allowing you to make informed decisions about how your information is used.
+            <br /><br />
+            Ultimately, we believe that robust privacy practices are essential for creating a secure and positive online environment. By prioritizing your privacy, we aim to cultivate a relationship built on trust and mutual respect, fostering a community where you can feel safe and valued.
+        </p>
           
-          <h3 className="text-xl font-semibold text-gray-900 mb-3">Our Privacy Principles</h3>
-          <ul className="list-disc pl-6 space-y-2 text-gray-600 mb-6">
-            <li>Transparency in all data collection and processing</li>
-            <li>User control over personal data</li>
-            <li>Strong security measures to protect your information</li>
-            <li>Regular updates on our privacy practices</li>
-          </ul>
+
+
         </>
       ),
     },
@@ -620,12 +662,13 @@ function App() {
             <SectionContent sectionId={activeSection} />
           </div>
 
-          {/* Quick Actions - Now on the right side and persistent */}
+          {/* Quick Actions and Privacy Officer Contact - Now on the right side and persistent */}
           <div className="space-y-4">
             <QuickActions 
               handleViewUUID={handleViewUUID} 
               handleManagePreferences={handleManagePreferences} 
             />
+            <PrivacyOfficerContact />
           </div>
         </div>
       </main>
