@@ -1,13 +1,11 @@
 /// <reference types="vite/client" />
 
-interface OsanoDrawer {
-  showDrawer: (id: string) => void;
-  cmpVersion: string;
-}
-
 interface Window {
-  Osano: {
-    cm: OsanoDrawer;
+  Osano?: {
+    cm?: {
+      showDrawer: (arg: string) => void;
+      cmpVersion?: string;
+    };
   };
   showUUIDModal: (uuid: string) => void;
 }

@@ -12,6 +12,14 @@ import {
   Fingerprint,
   X,
   Table,
+  File,
+  FileCog,
+  FileCheck,
+  FileSearch,
+  KeyRound,
+  ShieldCheck,
+  AlertTriangle,
+  Server,
 } from 'lucide-react';
 
 interface ModalProps {
@@ -35,6 +43,50 @@ const Modal = ({ isOpen, onClose, children }: ModalProps) => {
         {children}
       </div>
     </div>
+  );
+};
+
+const DataSubjectForm = () => {
+  return (
+    <iframe 
+      src="https://my.datasubject.com/6oqitUFyT8GP2H6v/38386" 
+      width="100%" 
+      height="600px" 
+      frameBorder="0" 
+      title="Data Subject Access Request Form"
+      style={{ minHeight: '600px' }}
+    />
+  );
+};
+
+interface DocumentTileProps {
+  title: string;
+  description: string;
+  url: string;
+  icon: React.ElementType;
+}
+
+const DocumentTile = ({ title, description, url, icon: Icon }: DocumentTileProps) => {
+  return (
+    <a 
+      href={url} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="block bg-white rounded-lg shadow hover:shadow-md transition p-6 border border-gray-100 hover:border-indigo-100"
+    >
+      <div className="flex items-start gap-4">
+        <div className="bg-indigo-50 p-3 rounded-lg">
+          <Icon className="h-6 w-6 text-indigo-600" />
+        </div>
+        <div>
+          <h3 className="font-medium text-gray-900 mb-1">{title}</h3>
+          <p className="text-sm text-gray-500">{description}</p>
+          <div className="mt-3 text-indigo-600 text-sm font-medium flex items-center gap-1">
+            View document <ExternalLink className="h-3 w-3 ml-1" />
+          </div>
+        </div>
+      </div>
+    </a>
   );
 };
 
@@ -122,6 +174,133 @@ interface CookieDisclosure {
   provider: string;
 }
 
+const privacyDocuments = [
+  {
+    title: 'Data Licensing Agreement',
+    description: 'Terms governing the licensing and use of data between parties.',
+    url: 'https://osano.trusthub.com/data-license',
+    icon: File,
+  },
+  {
+    title: 'Cookie Policy',
+    description: 'Details on how we use cookies and similar technologies on our website.',
+    url: 'https://osano.trusthub.com/cookies',
+    icon: Cookie,
+  },
+  {
+    title: 'Service Level Statement',
+    description: 'Our commitment to service availability and performance standards.',
+    url: 'https://osano.trusthub.com/sls',
+    icon: FileCog,
+  },
+  {
+    title: 'Terms of Service',
+    description: 'Enterprise and Premier Plans terms and conditions for using our services.',
+    url: 'https://osano.trusthub.com/terms-enterprise',
+    icon: FileCheck,
+  },
+  {
+    title: 'Privacy for Job Applicants',
+    description: 'How we handle personal information during the recruitment process.',
+    url: 'https://osano.trusthub.com/privacy-job-applicants',
+    icon: FileSearch,
+  },
+];
+
+const securityFeatures = [
+  {
+    title: 'End-to-End Encryption',
+    description: 'All data is encrypted in transit and at rest using industry-standard AES-256 encryption.',
+    icon: Lock,
+    status: 'active' as const,
+  },
+  {
+    title: 'Multi-Factor Authentication',
+    description: 'Secure your account with an additional layer of security beyond just a password.',
+    icon: KeyRound,
+    status: 'active' as const,
+  },
+  {
+    title: 'SOC 2 Type II Compliance',
+    description: 'Our systems and processes are regularly audited for security, availability, and confidentiality.',
+    icon: ShieldCheck,
+    status: 'active' as const,
+  },
+  {
+    title: 'GDPR Compliance',
+    description: 'Our platform is designed to help you meet GDPR requirements for data protection.',
+    icon: Shield,
+    status: 'active' as const,
+  },
+  {
+    title: 'Vulnerability Scanning',
+    description: 'Regular automated scanning of our systems to identify and address potential security vulnerabilities.',
+    icon: AlertTriangle,
+    status: 'active' as const,
+  },
+  {
+    title: 'Secure Data Centers',
+    description: 'Our infrastructure is hosted in SOC 2 compliant data centers with physical security measures.',
+    icon: Server,
+    status: 'active' as const,
+  },
+];
+
+const securityCertifications = [
+  {
+    name: 'SOC 2 Type II',
+    description: 'Audited for security, availability, and confidentiality controls',
+    status: 'Certified',
+    icon: ShieldCheck,
+  },
+  {
+    name: 'ISO 27001',
+    description: 'Information security management system certification',
+    status: 'Certified',
+    icon: Shield,
+  },
+  {
+    name: 'GDPR Compliance',
+    description: 'Compliant with EU General Data Protection Regulation',
+    status: 'Compliant',
+    icon: Shield,
+  },
+  {
+    name: 'CCPA Compliance',
+    description: 'Compliant with California Consumer Privacy Act',
+    status: 'Compliant',
+    icon: Shield,
+  },
+];
+
+// Quick Actions component that will be persistent across all tabs
+const QuickActions = ({ handleViewUUID, handleManagePreferences }: { 
+  handleViewUUID: () => void, 
+  handleManagePreferences: () => void 
+}) => {
+  return (
+    <div className="bg-white rounded-lg p-4 sticky top-4 shadow">
+      <h3 className="text-lg font-medium text-gray-900 mb-3">Quick Actions</h3>
+      <div className="space-y-3">
+        <button
+          onClick={handleViewUUID}
+          className="w-full flex items-center justify-between px-4 py-2 bg-white rounded border border-gray-300 hover:bg-gray-50 text-gray-800"
+        >
+          <span className="font-medium">View your UUID</span>
+          <Fingerprint className="h-4 w-4 text-indigo-600" />
+        </button>
+        <button
+          onClick={handleManagePreferences}
+          className="w-full flex items-center justify-between px-4 py-2 bg-white rounded border border-gray-300 hover:bg-gray-50 text-gray-800"
+        >
+          <span className="font-medium">Update Preferences</span>
+          <ExternalLink className="h-4 w-4 text-indigo-600" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [activeSection, setActiveSection] = useState('privacy');
   const [isUUIDModalOpen, setIsUUIDModalOpen] = useState(false);
@@ -197,27 +376,9 @@ function App() {
             We believe in complete transparency when it comes to your data. Our visible privacy approach
             means you always know what data we collect, how we use it, and why it matters.
           </p>
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Quick Actions</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={handleViewUUID}
-                className="flex items-center justify-between px-4 py-2 bg-white rounded border hover:bg-gray-50"
-              >
-                View your UUID
-                <Fingerprint className="h-4 w-4" />
-              </button>
-              <button
-                onClick={handleManagePreferences}
-                className="flex items-center justify-between px-4 py-2 bg-white rounded border hover:bg-gray-50"
-              >
-                Update Preferences
-                <ExternalLink className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+          
           <h3 className="text-xl font-semibold text-gray-900 mb-3">Our Privacy Principles</h3>
-          <ul className="list-disc pl-6 space-y-2 text-gray-600">
+          <ul className="list-disc pl-6 space-y-2 text-gray-600 mb-6">
             <li>Transparency in all data collection and processing</li>
             <li>User control over personal data</li>
             <li>Strong security measures to protect your information</li>
@@ -233,16 +394,16 @@ function App() {
           <p className="text-gray-600 mb-6">
             Manage your cookie preferences here. We use cookies to enhance your browsing experience.
           </p>
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-white rounded-lg p-4 shadow">
             <h3 className="text-lg font-medium text-gray-900 mb-2">Cookie Information</h3>
             <div className="grid grid-cols-1 gap-4">
               <button
                 onClick={fetchCookieDisclosures}
-                className="flex items-center justify-between px-4 py-2 bg-white rounded border hover:bg-gray-50"
+                className="flex items-center justify-between px-4 py-2 bg-white rounded border border-gray-300 hover:bg-gray-50 text-gray-800 font-medium"
                 disabled={isLoading}
               >
                 {isLoading ? 'Loading...' : 'View Cookie Disclosures'}
-                <Table className="h-4 w-4" />
+                <Table className="h-4 w-4 text-indigo-600" />
               </button>
               {error && <p className="text-red-600 text-sm">{error}</p>}
             </div>
@@ -252,15 +413,121 @@ function App() {
     },
     rights: {
       title: 'Your Data Rights',
-      content: <p className="text-gray-600">Learn about your rights regarding your personal data and how to exercise them.</p>,
+      content: (
+        <div>
+          <p className="text-gray-600 mb-6">
+            By using the form below, you can exercise your right to know and obtain communication with regard to the purposes for which your personal data is processed, 
+            where possible the period for which your personal data is processed, the recipients of the personal data, the logic involved in any automatic personal data processing and, at 
+            least when based on profiling, the consequences of such processing.
+          </p>
+          
+          <div className="bg-white rounded-lg p-6 shadow">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Data Subject Access Request</h3>
+            <DataSubjectForm />
+          </div>
+        </div>
+      ),
     },
     policies: {
       title: 'Privacy Documents',
-      content: <p className="text-gray-600">Access and download our privacy policy and other related documents.</p>,
+      content: (
+        <div>
+          <p className="text-gray-600 mb-6">
+            Access and download our privacy policy and other related documents. These documents outline our commitments, 
+            practices, and legal terms regarding data privacy and protection.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {privacyDocuments.map((doc, index) => (
+              <DocumentTile 
+                key={index}
+                title={doc.title}
+                description={doc.description}
+                url={doc.url}
+                icon={doc.icon}
+              />
+            ))}
+          </div>
+        </div>
+      ),
     },
     security: {
       title: 'Security Measures',
-      content: <p className="text-gray-600">Explore the security measures we have in place to protect your data.</p>,
+      content: (
+        <div>
+          <p className="text-gray-600 mb-6">
+            We implement multiple layers of security to protect your data and ensure the integrity of our platform.
+            Below are the key security features and certifications that safeguard your information.
+          </p>
+          
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">Security Features</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {securityFeatures.map((feature, index) => (
+              <div key={index} className="bg-white rounded-lg shadow p-5 border border-gray-100">
+                <div className="flex items-start gap-4">
+                  <div className="bg-indigo-50 p-3 rounded-lg">
+                    <feature.icon className="h-6 w-6 text-indigo-600" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-gray-900">{feature.title}</h3>
+                      {feature.status === 'active' && (
+                        <span className="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">{feature.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">Certifications & Compliance</h3>
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Certification
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Description
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {securityCertifications.map((cert, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-indigo-50 rounded-full">
+                          <cert.icon className="h-5 w-5 text-indigo-600" />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{cert.name}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-gray-500">{cert.description}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        {cert.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ),
     },
     transparency: {
       title: 'Transparency Reports',
@@ -281,24 +548,18 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#180d43] text-white">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-[#180d43] shadow-md border-b border-indigo-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Shield className="h-6 w-6 text-indigo-600" />
+            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+              <Shield className="h-6 w-6 text-indigo-300" />
               Trust Hub
             </h1>
-            <div className="flex items-center gap-4">
-              <button className="text-gray-500 hover:text-gray-700">
+            <div className="flex items-center">
+              <button className="text-indigo-200 hover:text-white transition-colors">
                 <Bell className="h-5 w-5" />
-              </button>
-              <button
-                onClick={handleManagePreferences}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition"
-              >
-                Manage Preferences
               </button>
             </div>
           </div>
@@ -309,7 +570,7 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {stats.map((stat) => (
-            <div key={stat.id} className="bg-white overflow-hidden shadow rounded-lg p-6 hover:shadow-md transition">
+            <div key={stat.id} className="bg-white overflow-hidden shadow rounded-lg p-6 hover:shadow-md transition text-gray-900">
               {stat.render ? (
                 stat.render()
               ) : (
@@ -326,7 +587,7 @@ function App() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Navigation */}
           <div className="space-y-4">
             {sections.map((section) => {
@@ -336,14 +597,16 @@ function App() {
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
                   className={`w-full text-left px-4 py-3 rounded-lg flex items-center justify-between ${
-                    activeSection === section.id ? 'bg-indigo-50 text-indigo-700' : 'bg-white hover:bg-gray-50'
+                    activeSection === section.id ? 'bg-indigo-600 text-white' : 'bg-white text-gray-900 hover:bg-gray-50'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon className="h-5 w-5" />
                     <div>
                       <div className="font-medium">{section.title}</div>
-                      <div className="text-sm text-gray-500">{section.description}</div>
+                      <div className={`text-sm ${activeSection === section.id ? 'text-indigo-100' : 'text-gray-500'}`}>
+                        {section.description}
+                      </div>
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5" />
@@ -353,8 +616,16 @@ function App() {
           </div>
 
           {/* Content Area */}
-          <div className="md:col-span-2 bg-white rounded-lg shadow p-6">
+          <div className="md:col-span-2 bg-white rounded-lg shadow p-6 text-gray-900">
             <SectionContent sectionId={activeSection} />
+          </div>
+
+          {/* Quick Actions - Now on the right side and persistent */}
+          <div className="space-y-4">
+            <QuickActions 
+              handleViewUUID={handleViewUUID} 
+              handleManagePreferences={handleManagePreferences} 
+            />
           </div>
         </div>
       </main>
