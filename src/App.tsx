@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import {
   Shield,
-  Cookie,
+  Waypoints,
   UserCircle,
+  Cookie,
   FileText,
   Lock,
   LineChart,
@@ -31,7 +32,8 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
-const Modal = ({ isOpen, onClose, children }: ModalProps) => {
+// Memoized Modal component
+const Modal = React.memo(({ isOpen, onClose, children }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -47,20 +49,18 @@ const Modal = ({ isOpen, onClose, children }: ModalProps) => {
       </div>
     </div>
   );
-};
+});
 
-const DataSubjectForm = () => {
-  return (
-    <iframe 
-      src="https://my.datasubject.com/6oqitUFyT8GP2H6v/38386" 
-      width="100%" 
-      height="600px" 
-      frameBorder="0" 
-      title="Data Subject Access Request Form"
-      style={{ minHeight: '600px' }}
-    />
-  );
-};
+const DataSubjectForm = () => (
+  <iframe
+    src="https://my.datasubject.com/6oqitUFyT8GP2H6v/38386"
+    width="100%"
+    height="600px"
+    frameBorder="0"
+    title="Data Subject Access Request Form"
+    style={{ minHeight: '600px' }}
+  />
+);
 
 interface DocumentTileProps {
   title: string;
@@ -69,12 +69,13 @@ interface DocumentTileProps {
   icon: React.ElementType;
 }
 
-const DocumentTile = ({ title, description, url, icon: Icon }: DocumentTileProps) => {
+// Memoized DocumentTile component
+const DocumentTile = React.memo(({ title, description, url, icon: Icon }: DocumentTileProps) => {
   return (
-    <a 
-      href={url} 
-      target="_blank" 
-      rel="noopener noreferrer" 
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
       className="block bg-white rounded-lg shadow hover:shadow-md transition p-6 border border-gray-100 hover:border-indigo-100"
     >
       <div className="flex items-start gap-4">
@@ -91,20 +92,20 @@ const DocumentTile = ({ title, description, url, icon: Icon }: DocumentTileProps
       </div>
     </a>
   );
-};
+});
 
 const sections = [
-  {
-    id: 'cookies',
-    title: 'Cookie Management',
-    icon: Cookie,
-    description: 'Control your cookie preferences and understand how we use them.',
-  },
   {
     id: 'rights',
     title: 'Your Data Rights',
     icon: UserCircle,
     description: 'Understand and exercise your data protection rights.',
+  },
+  {
+    id: 'subprocessors',
+    title: 'Subprocessors',
+    icon: Waypoints,
+    description: 'View the subprocessors we use and their privacy scores.',
   },
   {
     id: 'policies',
@@ -241,10 +242,10 @@ const privacyOfficerInfo = {
   phone: "+1 (555) 123-4567",
 };
 
-// Contact card component for the Data Privacy Officer
-const PrivacyOfficerContact = () => {
+// Memoized PrivacyOfficerContact component
+const PrivacyOfficerContact = React.memo(({ marginTop }: { marginTop: string }) => {
   return (
-    <div className="bg-white rounded-lg p-4 shadow mt-4">
+    <div className="bg-white rounded-lg p-4 shadow" style={{ marginTop }}>
       <h3 className="text-lg font-medium text-gray-900 mb-3">Data Privacy Officer</h3>
       <div className="space-y-3">
         <div className="bg-indigo-50 p-3 rounded-lg inline-flex items-center justify-center">
@@ -253,21 +254,21 @@ const PrivacyOfficerContact = () => {
         <div className="space-y-2">
           <p className="font-medium text-gray-900">{privacyOfficerInfo.name}</p>
           <p className="text-sm text-gray-500">{privacyOfficerInfo.title}</p>
-          
+
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <Mail className="h-4 w-4 text-indigo-600" />
             <a href={`mailto:${privacyOfficerInfo.email}`} className="hover:text-indigo-600">
               {privacyOfficerInfo.email}
             </a>
           </div>
-          
+
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <Phone className="h-4 w-4 text-indigo-600" />
             <a href={`tel:${privacyOfficerInfo.phone}`} className="hover:text-indigo-600">
               {privacyOfficerInfo.phone}
             </a>
           </div>
-          
+
           <p className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-100">
             Contact our Data Privacy Officer with any concerns about your personal data or our privacy practices.
           </p>
@@ -275,13 +276,13 @@ const PrivacyOfficerContact = () => {
       </div>
     </div>
   );
-};
+});
 
-// Privacy Statement Card component
-const PrivacyStatementCard = () => {
+// Memoized PrivacyStatementCard component
+const PrivacyStatementCard = React.memo(() => {
   return (
     <div className="bg-white rounded-lg shadow p-6 mb-8">
-      <div className="flex items-start gap-4 mb-4">
+      <div className="flex items-start gap-4">
         <div className="flex-shrink-0">
           <div className="bg-indigo-50 p-3 rounded-lg">
             <Shield className="h-6 w-6 text-indigo-600" />
@@ -289,11 +290,19 @@ const PrivacyStatementCard = () => {
         </div>
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Osano</h2>
-          <p className="text-gray-600">
-            Osano is a leading privacy platform that helps organizations manage consent, data rights, and privacy compliance.
-            Our comprehensive solution enables businesses to build trust with their users through transparent privacy practices.
+
+          <p className="text-gray-600 mb-4">
+            At Osano, your privacy is paramount. We're committed to "Visible Privacy" - being transparent about how we collect, use, and protect your personal information.
           </p>
-          
+
+          <p className="text-gray-600 mb-4">
+            We build trust through transparency and accountability, ensuring you feel confident when using our services. Our approach exceeds regulatory compliance by providing clear information about your privacy rights and meaningful control over your data.
+          </p>
+
+          <p className="text-gray-600 mb-4">
+            We believe strong privacy practices create a secure online environment, fostering relationships built on trust and respect where you feel safe and valued.
+          </p>
+
           <div className="flex items-center gap-4 mt-4">
             <a href="mailto:privacy@osano.com" className="flex items-center text-indigo-600 hover:text-indigo-800 text-sm font-medium">
               <Mail className="h-4 w-4 mr-1" />
@@ -306,32 +315,20 @@ const PrivacyStatementCard = () => {
           </div>
         </div>
       </div>
-      
-      <div className="mt-4 pt-4 border-t border-gray-100">
-        <h3 className="text-xl font-semibold text-gray-900 mb-3">Privacy Statement</h3>
-        <p className="text-gray-600 mb-4">
-          At Osano, your privacy is paramount. We're committed to "Visible Privacy" - being transparent about how we collect, use, and protect your personal information.
-        </p>
-        
-        <p className="text-gray-600 mb-4">
-          We build trust through transparency and accountability, ensuring you feel confident when using our services. Our approach exceeds regulatory compliance by providing clear information about your privacy rights and meaningful control over your data.
-        </p>
-        
-        <p className="text-gray-600 mb-4">
-          We believe strong privacy practices create a secure online environment, fostering relationships built on trust and respect where you feel safe and valued.
-        </p>
-      </div>
     </div>
   );
-};
+});
 
-// Quick Actions component that will be persistent across all tabs
-const QuickActions = ({ handleViewUUID, handleManagePreferences }: { 
-  handleViewUUID: () => void, 
-  handleManagePreferences: () => void 
+// Memoized QuickActions component
+const QuickActions = React.memo(({ handleViewUUID, handleManagePreferences, handleViewCookieDisclosures, isLoading }: {
+  handleViewUUID: () => void,
+  handleManagePreferences: () => void,
+  handleViewCookieDisclosures: () => void,
+  isLoading: boolean
 }) => {
+
   return (
-    <div className="bg-white rounded-lg p-4 sticky top-4 shadow">
+    <div className="bg-white rounded-lg p-4 shadow">
       <h3 className="text-lg font-medium text-gray-900 mb-3">Quick Actions</h3>
       <div className="space-y-3">
         <button
@@ -348,90 +345,110 @@ const QuickActions = ({ handleViewUUID, handleManagePreferences }: {
           <span className="font-medium">Update Preferences</span>
           <ExternalLink className="h-4 w-4 text-indigo-600" />
         </button>
+        <button
+          onClick={handleViewCookieDisclosures}
+          className="w-full flex items-center justify-between px-4 py-2 bg-white rounded border border-gray-300 hover:bg-gray-50 text-gray-800"
+          disabled={isLoading}
+        >
+          <span className="font-medium">{isLoading ? 'Loading...' : 'View Cookie Disclosures'}</span>
+          <Table className="h-4 w-4 text-indigo-600" />
+        </button>
       </div>
     </div>
   );
-};
+});
 
-function App() {
-  const [activeSection, setActiveSection] = useState('cookies');
-  const [isUUIDModalOpen, setIsUUIDModalOpen] = useState(false);
-  const [isDisclosureModalOpen, setIsDisclosureModalOpen] = useState(false);
-  const [uuid, setUUID] = useState('');
-  const [disclosures, setDisclosures] = useState<CookieDisclosure[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+interface SectionContentProps {
+  sectionId: string;
+  disclosures: CookieDisclosure[];
+  error: string | null;
+  fetchCookieDisclosures: () => Promise<void>;
+}
 
-  useEffect(() => {
-    window.showUUIDModal = (uuid: string) => {
-      setUUID(uuid);
-      setIsUUIDModalOpen(true);
-    };
-  }, []);
+interface Vendor {
+  name: string;
+  privacyScore: number;
+  category: string;
+}
 
-  const handleManagePreferences = () => {
-    if (window.Osano?.cm?.showDrawer) {
-      window.Osano.cm.showDrawer('osano-cm-dom-info-dialog-open');
-    }
+// Memoized SectionContent component
+const SectionContent = React.memo(({ sectionId, disclosures, error, fetchCookieDisclosures }: SectionContentProps) => {
+  const mockVendors: Vendor[] = [
+    { name: 'AWS', privacyScore: 92, category: 'Cloud Infrastructure' },
+    { name: 'Stripe', privacyScore: 88, category: 'Payment Processing' },
+    { name: 'Mailchimp', privacyScore: 78, category: 'Email Marketing' },
+    { name: 'Mixpanel', privacyScore: 65, category: 'Analytics' },
+    { name: 'Intercom', privacyScore: 72, category: 'Customer Support' },
+    { name: 'Segment', privacyScore: 81, category: 'Data Integration' },
+  ];
+
+  const getScoreColor = (score: number) => {
+    if (score >= 86) return 'from-green-400 to-green-600';
+    if (score >= 65) return 'from-yellow-400 to-yellow-600';
+    return 'from-red-400 to-red-600';
   };
 
-  const handleViewUUID = () => {
-    const uuid = localStorage.getItem('osano_consentmanager_uuid');
-    if (uuid) {
-      setUUID(uuid);
-      setIsUUIDModalOpen(true);
-    }
+  const getScoreLabel = (score: number) => {
+    if (score >= 86) return 'Excellent';
+    if (score >= 75) return 'Good';
+    if (score >= 65) return 'Fair';
+    return 'Poor';
   };
 
-  const fetchCookieDisclosures = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(
-        'https://disclosure.api.osano.com/customer/6oqitUFyT8GP2H6v/config/710606b4-96df-4d9d-a998-28a4c478e86e?language=en'
-      );
-      if (!response.ok) throw new Error('Failed to fetch cookie disclosures');
-      const data = await response.json();
-
-      // Transform the data to match the table structure
-      const transformedDisclosures = data.map((item: any) => ({
-        name: item.name,
-        classification: item.classification,
-        purpose: item.purpose,
-        expiry: item.expiry,
-        provider: item.provider,
-      }));
-
-      setDisclosures(transformedDisclosures);
-      setIsDisclosureModalOpen(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
   const sectionContent = {
-    cookies: {
-      title: 'Cookie Management',
+    subprocessors: {
+      title: 'Subprocessors',
       content: (
         <div>
           <p className="text-gray-600 mb-6">
-            Manage your cookie preferences here. We use cookies to enhance your browsing experience.
+            Below is a list of third-party vendors (subprocessors) we use to provide our services. Each vendor has been assessed for privacy compliance and assigned a privacy score.
           </p>
-          <div className="bg-white rounded-lg p-4 shadow">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Cookie Information</h3>
-            <div className="grid grid-cols-1 gap-4">
-              <button
-                onClick={fetchCookieDisclosures}
-                className="flex items-center justify-between px-4 py-2 bg-white rounded border border-gray-300 hover:bg-gray-50 text-gray-800 font-medium"
-                disabled={isLoading}
+          <div className="grid grid-cols-1 gap-4">
+            {mockVendors.map((vendor) => (
+              <div
+                key={vendor.name}
+                className="bg-white rounded-lg p-5 shadow hover:shadow-md transition border border-gray-100 hover:border-indigo-100"
               >
-                {isLoading ? 'Loading...' : 'View Cookie Disclosures'}
-                <Table className="h-4 w-4 text-indigo-600" />
-              </button>
-              {error && <p className="text-red-600 text-sm">{error}</p>}
-            </div>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-gray-900 text-lg">{vendor.name}</span>
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                        {vendor.category}
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500 mt-1">Data Processing Subprocessor</span>
+                  </div>
+                  <div className="flex flex-col items-start md:items-end">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-600">Privacy Score:</span>
+                      <div className="relative">
+                        <div className={`h-8 w-16 flex items-center justify-center rounded-md bg-gradient-to-r ${getScoreColor(vendor.privacyScore)}`}>
+                          <span className="text-sm font-bold text-white">
+                            {vendor.privacyScore}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-xs mt-1 font-medium text-gray-500">
+                      {getScoreLabel(vendor.privacyScore)}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                    <div 
+                      className={`h-2.5 rounded-full bg-gradient-to-r ${getScoreColor(vendor.privacyScore)}`} 
+                      style={{ width: `${vendor.privacyScore}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-xs text-gray-500">0</span>
+                    <span className="text-xs text-gray-500">100</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       ),
@@ -441,11 +458,11 @@ function App() {
       content: (
         <div>
           <p className="text-gray-600 mb-6">
-            By using the form below, you can exercise your right to know and obtain communication with regard to the purposes for which your personal data is processed, 
-            where possible the period for which your personal data is processed, the recipients of the personal data, the logic involved in any automatic personal data processing and, at 
+            By using the form below, you can exercise your right to know and obtain communication with regard to the purposes for which your personal data is processed,
+            where possible the period for which your personal data is processed, the recipients of the personal data, the logic involved in any automatic personal data processing and, at
             least when based on profiling, the consequences of such processing.
           </p>
-          
+
           <div className="bg-white rounded-lg p-6 shadow">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Data Subject Access Request</h3>
             <DataSubjectForm />
@@ -458,14 +475,14 @@ function App() {
       content: (
         <div>
           <p className="text-gray-600 mb-6">
-            Access and download our privacy policy and other related documents. These documents outline our commitments, 
+            Access and download our privacy policy and other related documents. These documents outline our commitments,
             practices, and legal terms regarding data privacy and protection.
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {privacyDocuments.map((doc, index) => (
-              <DocumentTile 
-                key={index}
+            {privacyDocuments.map((doc) => (
+              <DocumentTile
+                key={doc.title}
                 title={doc.title}
                 description={doc.description}
                 url={doc.url}
@@ -484,11 +501,11 @@ function App() {
             We implement multiple layers of security to protect your data and ensure the integrity of our platform.
             Below are the key security features and certifications that safeguard your information.
           </p>
-          
+
           <h3 className="text-xl font-semibold text-gray-900 mb-4">Security Features</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {securityFeatures.map((feature, index) => (
-              <div key={index} className="bg-white rounded-lg shadow p-5 border border-gray-100">
+            {securityFeatures.map((feature) => (
+              <div key={feature.title} className="bg-white rounded-lg shadow p-5 border border-gray-100">
                 <div className="flex items-start gap-4">
                   <div className="bg-indigo-50 p-3 rounded-lg">
                     <feature.icon className="h-6 w-6 text-indigo-600" />
@@ -508,7 +525,7 @@ function App() {
               </div>
             ))}
           </div>
-          
+
           <h3 className="text-xl font-semibold text-gray-900 mb-4">Certifications & Compliance</h3>
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
@@ -526,8 +543,8 @@ function App() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {securityCertifications.map((cert, index) => (
-                  <tr key={index}>
+                {securityCertifications.map((cert) => (
+                  <tr key={cert.name}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-indigo-50 rounded-full">
@@ -562,19 +579,112 @@ function App() {
     },
   };
 
-  function SectionContent({ sectionId }: { sectionId: string }) {
-    const section = sectionContent[sectionId as keyof typeof sectionContent];
-    return (
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">{section.title}</h2>
-        <div className="prose max-w-none">{section.content}</div>
-      </div>
-    );
+  const section = sectionContent[sectionId as keyof typeof sectionContent];
+  return (
+    <div>
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">{section.title}</h2>
+      <div className="prose max-w-none">{section.content}</div>
+      {error && <p className="text-red-600 text-sm mt-4">{error}</p>}
+    </div>
+  );
+});
+
+interface GPCIndicatorProps {
+  gpcStatus: boolean | undefined;
+}
+
+const GPCIndicator: React.FC<GPCIndicatorProps> = React.memo(({ gpcStatus }) => {
+  const statusColor = gpcStatus ? 'bg-green-500' : 'bg-red-500';
+  const statusText = gpcStatus ? 'GPC Signal Detected' : 'GPC Signal Not Detected';
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className={`h-3 w-3 rounded-full ${statusColor}`}></div>
+      <span className="text-sm text-gray-300">{statusText}</span>
+    </div>
+  );
+});
+
+function App() {
+  const [activeSection, setActiveSection] = useState('rights');
+  const [isUUIDModalOpen, setIsUUIDModalOpen] = useState(false);
+  const [isDisclosureModalOpen, setIsDisclosureModalOpen] = useState(false);
+  const [uuid, setUUID] = useState('');
+  const [disclosures, setDisclosures] = useState<CookieDisclosure[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [gpcStatus, setGpcStatus] = useState<boolean | undefined>();
+
+  const quickActionsRef = useRef<HTMLDivElement>(null);
+  const [quickActionsHeight, setQuickActionsHeight] = useState('0px');
+
+
+  useEffect(() => {
+    setGpcStatus(navigator.globalPrivacyControl);
+  }, []);
+
+    // Fetch cookie disclosures
+  const fetchCookieDisclosures = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        'https://disclosure.api.osano.com/customer/6oqitUFyT8GP2H6v/config/710606b4-96df-4d9d-a998-28a4c478e86e?language=en'
+      );
+      if (!response.ok) throw new Error('Failed to fetch cookie disclosures');
+      const data = await response.json();
+
+      const transformedDisclosures = data.map((item: any) => ({
+        name: item.name,
+        classification: item.classification,
+        purpose: item.purpose,
+        expiry: item.expiry,
+        provider: item.provider,
+      }));
+
+      setDisclosures(transformedDisclosures);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.showUUIDModal = (uuid: string) => {
+      setUUID(uuid);
+      setIsUUIDModalOpen(true);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    if (quickActionsRef.current) {
+      setQuickActionsHeight(`${quickActionsRef.current.offsetHeight}px`);
+    }
+  }, [quickActionsRef]);
+
+
+  const handleManagePreferences = () => {
+    if (window.Osano?.cm?.showDrawer) {
+      window.Osano.cm.showDrawer('osano-cm-dom-info-dialog-open');
+    }
+  };
+
+  const handleViewUUID = () => {
+    const uuid = localStorage.getItem('osano_consentmanager_uuid');
+    if (uuid) {
+      setUUID(uuid);
+      setIsUUIDModalOpen(true);
+    }
+  };
+
+  const handleViewCookieDisclosures = () => {
+    setIsDisclosureModalOpen(true);
+    fetchCookieDisclosures();
   }
 
   return (
     <div className="min-h-screen bg-[#180d43] text-white">
-      {/* Header */}
       <header className="bg-[#180d43] shadow-md border-b border-indigo-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
@@ -582,22 +692,20 @@ function App() {
               <Shield className="h-6 w-6 text-indigo-300" />
               Trust Hub
             </h1>
-            <div className="flex items-center">
-              <button className="text-indigo-200 hover:text-white transition-colors">
-                <Bell className="h-5 w-5" />
-              </button>
+            <div className="flex items-center mx-auto">
+              <GPCIndicator gpcStatus={gpcStatus} />
             </div>
+            <button className="text-indigo-200 hover:text-white transition-colors ml-4">
+              <Bell className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Privacy Statement Card - Horizontally spans the document */}
         <PrivacyStatementCard />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Navigation */}
           <div className="space-y-4">
             {sections.map((section) => {
               const Icon = section.icon;
@@ -624,23 +732,24 @@ function App() {
             })}
           </div>
 
-          {/* Content Area */}
           <div className="md:col-span-2 bg-white rounded-lg shadow p-6 text-gray-900">
-            <SectionContent sectionId={activeSection} />
+            <SectionContent sectionId={activeSection} disclosures={disclosures} error={error} fetchCookieDisclosures={fetchCookieDisclosures} />
           </div>
 
-          {/* Quick Actions and Privacy Officer Contact - Now on the right side and persistent */}
-          <div className="space-y-4">
-            <QuickActions 
-              handleViewUUID={handleViewUUID} 
-              handleManagePreferences={handleManagePreferences} 
-            />
-            <PrivacyOfficerContact />
+          <div className="sticky top-4">
+            <div ref={quickActionsRef}>
+              <QuickActions
+                handleViewUUID={handleViewUUID}
+                handleManagePreferences={handleManagePreferences}
+                handleViewCookieDisclosures={handleViewCookieDisclosures}
+                isLoading={isLoading}
+              />
+            </div>
+            <PrivacyOfficerContact marginTop={`calc(${quickActionsHeight} + 1rem)`} />
           </div>
         </div>
       </main>
 
-      {/* UUID Modal */}
       <Modal isOpen={isUUIDModalOpen} onClose={() => setIsUUIDModalOpen(false)}>
         <h3 className="text-xl font-bold text-gray-900 mb-4">Your Unique Identifier</h3>
         <div className="bg-gray-50 p-4 rounded-lg mb-4 font-mono text-sm text-gray-800 break-all border border-gray-200">{uuid}</div>
@@ -650,7 +759,6 @@ function App() {
         </p>
       </Modal>
 
-      {/* Cookie Disclosures Modal */}
       <Modal isOpen={isDisclosureModalOpen} onClose={() => setIsDisclosureModalOpen(false)}>
         <h3 className="text-xl font-bold text-gray-900 mb-4">Cookie Disclosures</h3>
         <div className="overflow-x-auto">
@@ -665,15 +773,23 @@ function App() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {disclosures.map((cookie, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cookie.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{cookie.classification}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{cookie.purpose}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cookie.expiry}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cookie.provider}</td>
+              {disclosures.length > 0 ? (
+                disclosures.map((cookie) => (
+                  <tr key={cookie.name}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cookie.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{cookie.classification}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">{cookie.purpose}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cookie.expiry}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cookie.provider}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="text-center py-4">
+                    {isLoading ? 'Loading disclosures...' : error ? `Error: ${error}` : 'No disclosures to display.'}
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
