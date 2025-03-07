@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import {
   Shield,
-  Waypoints,
-  UserCircle,
   Cookie,
+  UserCircle,
   FileText,
   Lock,
   LineChart,
@@ -104,7 +103,7 @@ const sections = [
   {
     id: 'subprocessors',
     title: 'Subprocessors',
-    icon: Waypoints,
+    icon: Cookie,
     description: 'View the subprocessors we use and their privacy scores.',
   },
   {
@@ -395,7 +394,7 @@ const SectionContent = React.memo(({ sectionId, disclosures, error, fetchCookieD
     return 'Poor';
   };
 
-  const sectionContent = {
+    const sectionContent = {
     subprocessors: {
       title: 'Subprocessors',
       content: (
@@ -737,14 +736,12 @@ function App() {
           </div>
 
           <div className="sticky top-4">
-            <div ref={quickActionsRef}>
-              <QuickActions
-                handleViewUUID={handleViewUUID}
-                handleManagePreferences={handleManagePreferences}
-                handleViewCookieDisclosures={handleViewCookieDisclosures}
-                isLoading={isLoading}
-              />
-            </div>
+            <QuickActions
+              handleViewUUID={handleViewUUID}
+              handleManagePreferences={handleManagePreferences}
+              handleViewCookieDisclosures={handleViewCookieDisclosures}
+              isLoading={isLoading}
+            />
             <PrivacyOfficerContact marginTop={`calc(${quickActionsHeight} + 1rem)`} />
           </div>
         </div>
