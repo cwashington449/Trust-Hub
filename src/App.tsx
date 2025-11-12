@@ -752,7 +752,8 @@ function App() {
         <div className="bg-gray-50 p-4 rounded-lg mb-4 font-mono text-sm text-gray-800 break-all border border-gray-200">{uuid}</div>
         <p className="text-gray-600 text-sm">
           This UUID is your unique identifier in our system. If you ever need to contact us about your personal
-          data, please provide this UUID to help us locate and process your information more efficiently.
+          data, please provide this UUID to help us locate and process your information more efficiently. Please note that clearing
+          your cache will reset this identifier and you will lose the history associated with it.
         </p>
       </Modal>
 
